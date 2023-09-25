@@ -15,8 +15,13 @@ export async function run(): Promise<void> {
 
     const git = simpleGit();
 
-    await git.add("./Package.swift")
-    await git.commit(commitMessage)
+    const diff = await git.diffSummary()
+
+    if (diff.changed > 0) {
+      await git.add(".")
+      await git.commit(commitMessage)
+    }
+
     await git.addAnnotatedTag(tagVersion, tagMessage)
     await git.raw("push", "origin", "-u", branchName, "--follow-tags")
   } catch (error) {
